@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Greenville RP Shared FRP Logger</title>
+
+<style>
+body{
+font-family:Arial,sans-serif;
+background:#1e1e1e;
+color:white;
+padding:20px;
+}
+
+.container{
+max-width:1200px;
+margin:auto;
+}
+
+input,select{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:5px;
+}
+
+button{
+padding:10px 15px;
+margin:5px;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+.add{
+background:#2ecc71;
+color:white;
+}
+
+.speeders{
+background:#f39c12;
+color:white;
+}
+
+.deleteBtn{
+background:#e74c3c;
+color:white;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+}
+
+th,td{
+padding:10px;
+border:1px solid #444;
+}
+
+th{
+background:#333;
+}
+
+.over100{
+background:#5c1f1f;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🚔 Greenville RP Shared FRP Logger</h1>
+
+<input id="player" placeholder="Player Name">
+
+<input id="speed"
+type="number"
+placeholder="Speed MPH">
+
+<select id="reason">
+<option>FRP</option>
+<option>Speeding</option>
+<option>Reckless Driving</option>
+<option>Fail To Yield</option>
+<option>Other</option>
+</select>
+
+<input id="notes"
+placeholder="Notes">
+
+<button
+class="add"
+onclick="addReport()">
+
+Add Report
+
+</button>
+
+<button
+class="speeders"
+onclick="showSpeeders()">
+
+Show >100 MPH
+
+</button>
+
+<button
+onclick="showAll()">
+
+Show All
+
+</button>
+
+<table>
+
+<thead>
+
+<tr>
+<th>Player</th>
+<th>Speed</th>
+<th>Reason</th>
+<th>Notes</th>
+<th>Time</th>
+<th>Delete</th>
+</tr>
+
+</thead>
+
+<tbody id="reportTable"></tbody>
+
+</table>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+push,
+onValue,
+remove
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyCzvQXuU4BO5ntZ7B9zYfDA1fPdC0GnCgY",
+
+authDomain:
+"frp-log-system.firebaseapp.com",
+
+databaseURL:
+"https://frp-log-system-default-rtdb.firebaseio.com",
+
+projectId:
+"frp-log-system",
+
+storageBucket:
+"frp-log-system.firebasestorage.app",
+
+messagingSenderId:
+"261965861020",
+
+appId:
+"1:261965861020:web:e1866318ad5ded671a1d59"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+const reportsRef =
+ref(db,"reports");
+
+let reports = [];
+
+window.addReport = function(){
+
+const player =
+document.getElementById("player").value;
+
+const speed =
+Number(
+document.getElementById("speed").value
+);
+
+const reason =
+document.getElementById("reason").value;
+
+const notes =
+document.getElementById("notes").value;
+
+if(!player){
+alert("Enter Player Name");
+return;
+}
+
+push(reportsRef,{
+
+player:player,
+speed:speed,
+reason:reason,
+notes:notes,
+time:new Date().toLocaleString()
+
+});
+
+document.getElementById("player").value="";
+document.getElementById("speed").value="";
+document.getElementById("notes").value="";
+
+};
+
+window.deleteReport = function(id){
+
+remove(
+ref(db,"reports/" + id)
+);
+
+};
+
+function renderReports(data){
+
+const table =
+document.getElementById("reportTable");
+
+table.innerHTML = "";
+
+data.forEach(r=>{
+
+let row =
+document.createElement("tr");
+
+if(r.speed > 100){
+row.classList.add("over100");
+}
+
+row.innerHTML = `
+<td>${r.player}</td>
+<td>${r.speed} MPH</td>
+<td>${r.reason}</td>
+<td>${r.notes}</td>
+<td>${r.time}</td>
+<td>
+<button
+class="deleteBtn"
+onclick="deleteReport('${r.id}')">
+Delete
+</button>
+</td>
+`;
+
+table.appendChild(row);
+
+});
+
+}
+
+window.showSpeeders = function(){
+
+renderReports(
+reports.filter(
+r => r.speed > 100
+)
+);
+
+};
+
+window.showAll = function(){
+
+renderReports(reports);
+
+};
+
+onValue(reportsRef,(snapshot)=>{
+
+reports = [];
+
+const data =
+snapshot.val();
+
+if(data){
+
+Object.entries(data)
+.forEach(([id,report])=>{
+
+report.id = id;
+
+reports.push(report);
+
+});
+
+}
+
+renderReports(reports);
+
+});
+
+</script>
+
+</body>
+</html>
