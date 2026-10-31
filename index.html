@@ -1,1 +1,282 @@
-<!DOCTYPE html><html><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>CODE3 RP V3 LIVE</title><script type="text/javascript" src="https://gc.kis.v2.scr.kaspersky-labs.com/FD126C42-EBFA-4E12-B309-BB3FDD723AC1/main.js?attr=0quUheVEl6jqx541GhCFpD2oHYGruuVv6uvc1r98ec5TLeuuHwVIwuizb30etSTZC535_XRiVSIG1wvTR50KwGtUPYOM4d-sW2Ll4sFn2hIJSoV3TIA9TMhswoJ9O_9mNz0PhZnOaeiW-4_8RzL7aSbwLQUn8RmO0sR6uim089MW6usCoF1xpFjBpL7TN8ag5Mb4vcqlxPbxpVt45MJqZgdjCXUTnBsJlwV8UVf8nzlTGEsON5WIJZpjh02yovyaPJxG8oIw_EbxRtCJ37QuSWvIZqoiRz82L6ujLnXvvJSveVPiyF-WQrdePowSOyLE" charset="UTF-8"></script><style>*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,sans-serif}body{min-height:100vh;color:#fff;background:radial-gradient(circle at 10% 10%,rgba(59,130,246,.35),transparent 30%),radial-gradient(circle at 90% 15%,rgba(139,92,246,.35),transparent 30%),radial-gradient(circle at 80% 80%,rgba(6,182,212,.25),transparent 25%),#070b14}.layout{display:grid;grid-template-columns:260px 1fr}.sidebar{padding:20px;background:rgba(255,255,255,.05);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,.08)}.logo{font-size:32px;font-weight:800}.sub{color:#9ca3af;margin-bottom:20px}.btn{width:100%;padding:14px;border:none;border-radius:14px;margin:6px 0;cursor:pointer;color:#fff;background:rgba(255,255,255,.08)}.main{padding:24px}.glass{background:rgba(255,255,255,.06);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.08);border-radius:24px}.hero,.card{padding:20px}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin:15px 0}.big{font-size:34px;font-weight:800}.page{display:none}.active{display:block}input,select,textarea{width:100%;padding:12px;margin:6px 0;background:rgba(255,255,255,.08);border:none;border-radius:12px;color:#fff}textarea{min-height:90px}.primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6)}.feedItem{padding:14px;margin:10px 0}.tag{display:inline-block;padding:4px 10px;border-radius:999px;background:#2563eb;margin-top:8px}</style></head><body><div class='layout'><div class='sidebar'><div class='logo'>🚨 CODE3 RP</div><div class='sub'>Live Staff Platform</div><button class='btn' onclick="showPage('dash')">Dashboard</button><button class='btn' onclick="showPage('report')">New Report</button><button class='btn' onclick="showPage('history')">History</button><button class='btn' onclick="showPage('offenders')">Offenders</button></div><div class='main'><div id='dash' class='page active'><div class='glass hero'><h1>🚨 CODE3 RP</h1><div>Staff Intelligence Center</div></div><div class='cards'><div class='glass card'>Reports<div id='r1' class='big'>0</div></div><div class='glass card'>100+ MPH<div id='r2' class='big'>0</div></div><div class='glass card'>Underaged<div id='r3' class='big'>0</div></div><div class='glass card'>Repeat<div id='r4' class='big'>0</div></div></div><div class='glass card'><h2>Recent Incidents</h2><div id='recent'></div></div></div><div id='report' class='page'><div class='glass card'><input id='moderator' list='mods' placeholder='Moderator'><datalist id='mods'></datalist><input id='player' list='players' placeholder='Player'><datalist id='players'></datalist><input id='vehicle' placeholder='Vehicle'><input id='speed' type='number' placeholder='Speed MPH'><select id='category'><option>Fail Roleplay (FRP)</option><option>Disrespecting Staff</option><option>Disrespecting Members</option><option>Underaged User (17+ Server)</option><option>Fail Driving RP</option><option>Trolling</option><option>Other</option></select><select id='severity'><option>Warning</option><option>Minor</option><option>Moderate</option><option>Severe</option><option>Ban Recommended</option></select><textarea id='notes' placeholder='Notes'></textarea><button class='btn primary' onclick='addReport()'>Submit</button></div></div><div id='history' class='page'><div class='glass card'><input id='search' placeholder='Search player...' oninput='renderHistory()'><div id='historyFeed'></div></div></div><div id='offenders' class='page'><div class='glass card'><div id='offendersFeed'></div></div></div></div></div><script type='module'>import{initializeApp}from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';import{getDatabase,ref,push,onValue}from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js';const firebaseConfig={apiKey:'AIzaSyCzvQXuU4BO5ntZ7B9zYfDA1fPdC0GnCgY',authDomain:'frp-log-system.firebaseapp.com',databaseURL:'https://frp-log-system-default-rtdb.firebaseio.com',projectId:'frp-log-system',storageBucket:'frp-log-system.firebasestorage.app',messagingSenderId:'261965861020',appId:'1:261965861020:web:e1866318ad5ded671a1d59'};const app=initializeApp(firebaseConfig);const db=getDatabase(app);const reportsRef=ref(db,'reports');let reports=[];window.showPage=id=>{document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById(id).classList.add('active')};window.addReport=()=>push(reportsRef,{player:player.value,moderator:moderator.value,vehicle:vehicle.value,speed:+speed.value||0,category:category.value,severity:severity.value,notes:notes.value,time:new Date().toLocaleString()});function refresh(){let c={};reports.forEach(x=>c[x.player]=(c[x.player]||0)+1);r1.textContent=reports.length;r2.textContent=reports.filter(x=>x.speed>100).length;r3.textContent=reports.filter(x=>String(x.category).includes('Underaged')).length;r4.textContent=Object.values(c).filter(v=>v>=2).length;players.innerHTML=[...new Set(reports.map(x=>x.player))].map(x=>`<option value="${x}">`).join('');mods.innerHTML=[...new Set(reports.map(x=>x.moderator))].map(x=>`<option value="${x}">`).join('');recent.innerHTML=reports.slice(0,5).map(r=>`<div class="glass feedItem"><b>${r.player}</b><br>${r.category}<br><span class="tag">${r.severity}</span></div>`).join('');renderHistory();offendersFeed.innerHTML=Object.entries(c).sort((a,b)=>b[1]-a[1]).map(o=>`<div class="glass feedItem"><b>${o[0]}</b><br>${o[1]} Reports</div>`).join('')}window.renderHistory=()=>{let q=(search?.value||'').toLowerCase();historyFeed.innerHTML=reports.filter(r=>r.player.toLowerCase().includes(q)).map(r=>`<div class="glass feedItem"><b>${r.player}</b><br>${r.category}<br>Moderator: ${r.moderator}<br>${r.time}</div>`).join('')};onValue(reportsRef,s=>{reports=[];const d=s.val();if(d)Object.values(d).forEach(v=>reports.push(v));refresh();});</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CODE3 FRP Log System</title>
+<style>
+  :root{--bg:#f3f4f6;--card:#fff;--text:#111827;--head:#1f2937;--muted:#6b7280;--border:#d1d5db;--accent:#2563eb;--danger:#dc2626;--ok:#16a34a}
+  body.dark{--bg:#111827;--card:#1f2937;--text:#f9fafb;--head:#0b1220;--muted:#9ca3af;--border:#374151}
+  *{box-sizing:border-box}
+  body{font-family:Arial,sans-serif;margin:0;background:var(--bg);color:var(--text)}
+  header{background:var(--head);color:#fff;padding:12px 16px}
+  header h2{margin:0 0 8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  #status{font-size:12px;font-weight:normal;padding:3px 8px;border-radius:12px;background:#6b7280}
+  #status.online{background:var(--ok)} #status.offline{background:var(--danger)}
+  .nav button{margin:3px 4px 3px 0;padding:8px 12px;border:0;border-radius:6px;background:#374151;color:#fff;cursor:pointer}
+  .nav button.active{background:var(--accent)}
+  .page{display:none;padding:16px;max-width:900px;margin:auto}
+  .page.active{display:block}
+  .card{background:var(--card);padding:12px;border-radius:8px;margin:10px 0;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  input,select,textarea{width:100%;padding:8px;margin:6px 0;border:1px solid var(--border);border-radius:6px;background:var(--card);color:var(--text);font:inherit}
+  textarea{min-height:90px;resize:vertical}
+  button.btn{padding:8px 12px;border:0;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;margin-right:4px}
+  button.btn.danger{background:var(--danger)} button.btn.gray{background:#6b7280} button.btn.ok{background:var(--ok)}
+  .muted{color:var(--muted);font-size:13px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+  .stat b{font-size:28px;display:block}
+  #toast{position:fixed;top:10px;right:10px;color:#fff;padding:10px 14px;border-radius:6px;display:none;z-index:99;background:var(--ok)}
+  #toast.error{background:var(--danger)}
+  .session{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+  .pill{font-size:12px;padding:2px 8px;border-radius:10px;background:var(--ok);color:#fff}
+</style>
+</head>
+<body>
+<header>
+  <h2>CODE3 FRP Log System <span id="status">Connecting…</span></h2>
+  <div class="nav">
+    <button data-page="dashboard" class="active">Dashboard</button>
+    <button data-page="report">Create Report</button>
+    <button data-page="history">History</button>
+    <button data-page="staff">Staff</button>
+    <button data-page="settings">Settings</button>
+  </div>
+</header>
+<div id="toast"></div>
+
+<div id="dashboard" class="page active">
+  <div class="stats">
+    <div class="card stat"><b id="totalReports">0</b>Total Reports</div>
+    <div class="card stat"><b id="activeStaff">0</b>Staff Currently Clocked In</div>
+  </div>
+  <div class="card"><b>Latest Reports</b><div id="latest" style="margin-top:8px"></div></div>
+</div>
+
+<div id="report" class="page">
+  <div class="card">
+    <h3 id="formTitle" style="margin-top:0">New Report</h3>
+    <input id="player" placeholder="Player Name">
+    <input id="moderator" placeholder="Moderator Name">
+    <select id="category"></select>
+    <input id="evidence" placeholder="Evidence (link)">
+    <textarea id="description" placeholder="Description"></textarea>
+    <button class="btn" id="submitBtn">Submit Report</button>
+    <button class="btn gray" id="cancelEditBtn" style="display:none">Cancel Edit</button>
+  </div>
+</div>
+
+<div id="history" class="page">
+  <input id="search" placeholder="Search reports">
+  <div id="reports"></div>
+</div>
+
+<div id="staff" class="page">
+  <div class="card">
+    <input id="staffName" placeholder="Moderator Name">
+    <button class="btn ok" id="clockInBtn">Clock In</button>
+    <button class="btn danger" id="clockOutBtn">Clock Out</button>
+    <div id="sessions" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<div id="settings" class="page">
+  <div class="card">
+    <button class="btn" id="themeBtn">Toggle Theme</button>
+    <p class="muted">Theme is saved on this device only. All reports and staff sessions are stored in Firebase and sync live across every device.</p>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, push, set, update, remove, onValue, runTransaction }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* ---------- Firebase config ---------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyCzvQXuU4BO5ntZ7B9zYfDA1fPdC0GnCgY",
+  authDomain: "frp-log-system.firebaseapp.com",
+  databaseURL: "https://frp-log-system-default-rtdb.firebaseio.com",
+  projectId: "frp-log-system",
+  storageBucket: "frp-log-system.firebasestorage.app",
+  messagingSenderId: "261965861020",
+  appId: "1:261965861020:web:e1866318ad5ded671a1d59"
+};
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* ---------- Helpers ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = t => t ? new Date(t).toLocaleString() : '';
+const categories = ['Fail Roleplay','Speeding','Reckless Driving','Traffic Violations','Evading Roleplay','Chat Abuse','Voice Chat Abuse','Mic Spam','Staff Disrespect','Member Disrespect','Underaged User','Trolling','Exploiting','Cheating','Impersonation','Advertising','Harassment','Inappropriate Language','Server Rule Violation','Other'];
+$('category').innerHTML = '<option value="">Select Category</option>' + categories.map(c => `<option>${esc(c)}</option>`).join('');
+
+let toastTimer;
+function toast(msg, isError){
+  const t = $('toast'); t.textContent = msg; t.className = isError ? 'error' : '';
+  t.style.display = 'block'; clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.style.display = 'none', 2200);
+}
+const fail = e => { console.error(e); toast('Error: ' + (e.code || e.message), true); };
+
+/* ---------- Navigation ---------- */
+document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === id));
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('active', b.dataset.page === id));
+}
+
+/* ---------- Connection status ---------- */
+onValue(ref(db, '.info/connected'), snap => {
+  const s = $('status');
+  s.className = snap.val() ? 'online' : 'offline';
+  s.textContent = snap.val() ? 'Live' : 'Offline';
+});
+
+/* ---------- Reports (realtime) ---------- */
+let reports = [];   // [{key, ...data}]
+let editingKey = null;
+
+onValue(ref(db, 'reports'), snap => {
+  const data = snap.val() || {};
+  reports = Object.entries(data).map(([key, v]) => ({ key, ...v }))
+                  .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  $('totalReports').textContent = reports.length;
+  renderLatest(); renderReports();
+}, fail);
+
+function renderLatest(){
+  $('latest').innerHTML = reports.slice(0, 5).map(r =>
+    `<div class="session"><span><b>${esc(r.id)}</b> ${esc(r.category)} — ${esc(r.player)}</span><span class="muted">${esc(fmt(r.createdAt))}</span></div>`
+  ).join('') || '<span class="muted">No reports yet.</span>';
+}
+
+function renderReports(){
+  const q = $('search').value.toLowerCase();
+  const wrap = $('reports'); wrap.innerHTML = '';
+  const list = reports.filter(r => JSON.stringify(r).toLowerCase().includes(q));
+  if (!list.length) { wrap.innerHTML = '<div class="card muted">No reports found.</div>'; return; }
+  list.forEach(r => {
+    const d = document.createElement('div'); d.className = 'card';
+    const ev = r.evidence ? (/^https?:\/\//i.test(r.evidence)
+      ? `<a href="${esc(r.evidence)}" target="_blank" rel="noopener noreferrer">${esc(r.evidence)}</a>` : esc(r.evidence)) : '—';
+    d.innerHTML = `<b>${esc(r.id)}</b> — ${esc(r.category)}<br>
+      Player: ${esc(r.player)} | Moderator: ${esc(r.moderator)}<br>
+      Evidence: ${ev}<br>
+      <span class="muted">${esc(r.description)}</span><br>
+      <span class="muted">${esc(fmt(r.createdAt))}</span><br><br>
+      <button class="btn edit">Edit</button><button class="btn danger del">Delete</button>`;
+    d.querySelector('.edit').onclick = () => startEdit(r);
+    d.querySelector('.del').onclick = () => {
+      if (!confirm('Delete ' + r.id + '?')) return;
+      remove(ref(db, 'reports/' + r.key)).then(() => toast('Report Deleted Successfully')).catch(fail);
+    };
+    wrap.appendChild(d);
+  });
+}
+$('search').addEventListener('input', renderReports);
+
+function startEdit(r){
+  editingKey = r.key;
+  $('player').value = r.player; $('moderator').value = r.moderator;
+  $('category').value = r.category; $('evidence').value = r.evidence || '';
+  $('description').value = r.description || '';
+  $('formTitle').textContent = 'Editing ' + r.id;
+  $('submitBtn').textContent = 'Save Changes';
+  $('cancelEditBtn').style.display = 'inline-block';
+  showPage('report');
+}
+function resetForm(){
+  editingKey = null;
+  ['player','moderator','evidence','description'].forEach(i => $(i).value = '');
+  $('category').value = '';
+  $('formTitle').textContent = 'New Report';
+  $('submitBtn').textContent = 'Submit Report';
+  $('cancelEditBtn').style.display = 'none';
+}
+$('cancelEditBtn').onclick = resetForm;
+
+// Atomic, shared counter so two moderators never get the same ID
+async function nextId(){
+  const res = await runTransaction(ref(db, 'counters/reportId'), n => (n || 0) + 1);
+  return 'CODE3-' + String(res.snapshot.val()).padStart(4, '0');
+}
+
+$('submitBtn').addEventListener('click', async () => {
+  const player = $('player').value.trim(), moderator = $('moderator').value.trim(), cat = $('category').value;
+  if (!player || !moderator || !cat) { toast('Complete required fields', true); return; }
+  const fields = { player, moderator, category: cat,
+    evidence: $('evidence').value.trim(), description: $('description').value.trim() };
+  const btn = $('submitBtn'); btn.disabled = true;
+  try {
+    if (editingKey) {
+      await update(ref(db, 'reports/' + editingKey), { ...fields, updatedAt: Date.now() });
+      toast('Report Updated Successfully');
+    } else {
+      const id = await nextId();
+      await set(push(ref(db, 'reports')), { id, ...fields, createdAt: Date.now() });
+      toast('Report Submitted Successfully');
+    }
+    resetForm();
+  } catch (e) { fail(e); }
+  btn.disabled = false;
+});
+
+/* ---------- Staff (realtime) ---------- */
+let sessions = [];
+onValue(ref(db, 'staff'), snap => {
+  const data = snap.val() || {};
+  sessions = Object.entries(data).map(([key, v]) => ({ key, ...v }))
+                   .sort((a, b) => (b.inTime || 0) - (a.inTime || 0));
+  $('activeStaff').textContent = sessions.filter(s => !s.outTime).length;
+  renderStaff();
+}, fail);
+
+function renderStaff(){
+  const wrap = $('sessions');
+  wrap.innerHTML = sessions.map(s => `<div class="session" data-key="${esc(s.key)}">
+      <span><b>${esc(s.name)}</b> | ${esc(fmt(s.inTime))} → ${s.outTime ? esc(fmt(s.outTime)) : '<span class="pill">Active</span>'}</span>
+      <span>${s.outTime ? '' : '<button class="btn danger out">Clock Out</button>'}<button class="btn gray rm">Remove</button></span>
+    </div>`).join('') || '<span class="muted">No sessions yet.</span>';
+  wrap.querySelectorAll('.session').forEach(row => {
+    const key = row.dataset.key;
+    const out = row.querySelector('.out');
+    if (out) out.onclick = () => clockOutKey(key);
+    row.querySelector('.rm').onclick = () => {
+      if (confirm('Remove this session?')) remove(ref(db, 'staff/' + key)).catch(fail);
+    };
+  });
+}
+
+function clockOutKey(key){
+  update(ref(db, 'staff/' + key), { outTime: Date.now() })
+    .then(() => toast('Clocked Out Successfully')).catch(fail);
+}
+
+$('clockInBtn').onclick = () => {
+  const name = $('staffName').value.trim();
+  if (!name) { toast('Enter a moderator name', true); return; }
+  if (sessions.some(s => !s.outTime && s.name.toLowerCase() === name.toLowerCase())) {
+    toast(name + ' is already clocked in', true); return;
+  }
+  set(push(ref(db, 'staff')), { name, inTime: Date.now() })
+    .then(() => toast('Clocked In Successfully')).catch(fail);
+};
+
+$('clockOutBtn').onclick = () => {
+  const name = $('staffName').value.trim().toLowerCase();
+  // latest active session (matching the typed name if one is entered)
+  const s = sessions.find(x => !x.outTime && (!name || x.name.toLowerCase() === name));
+  if (!s) { toast('No active session found', true); return; }
+  clockOutKey(s.key);
+};
+
+/* ---------- Theme (per device) ---------- */
+try { if (localStorage.getItem('code3_theme') === 'dark') document.body.classList.add('dark'); } catch(e){}
+$('themeBtn').onclick = () => {
+  document.body.classList.toggle('dark');
+  try { localStorage.setItem('code3_theme', document.body.classList.contains('dark') ? 'dark' : 'light'); } catch(e){}
+};
+</script>
+</body>
+</html>
