@@ -28,8 +28,17 @@ main{padding:36px clamp(20px,3.2vw,56px) 70px;max-width:1800px}.top{margin-botto
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import { getDatabase, ref, get, onValue, push, set, update, runTransaction, remove, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-database.js';
-const firebaseConfig={apiKey:'AIzaSyCzvQXuU4B05ntZ7B9zYfDA1fPdC0GnCgY',authDomain:'frp-log-system.firebaseapp.com',databaseURL:'https://frp-log-system-default-rtdb.firebaseio.com',projectId:'frp-log-system',storageBucket:'frp-log-system.firebasestorage.app',messagingSenderId:'261965861020',appId:'1:261965861020:web:e1866318ad5ded671a1d59',measurementId:'G-82J0HGDFVJ'};
-const appFirebase=initializeApp(firebaseConfig),auth=getAuth(appFirebase),database=getDatabase(appFirebase);
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyCzvQXuU4BO5ntZ7B9zYfDA1fPdC0GnCgY",
+  authDomain: "frp-log-system.firebaseapp.com",
+  databaseURL: "https://frp-log-system-default-rtdb.firebaseio.com",
+  projectId: "frp-log-system",
+  storageBucket: "frp-log-system.firebasestorage.app",
+  messagingSenderId: "261965861020",
+  appId: "1:261965861020:web:e1866318ad5ded671a1d59",
+  measurementId: "G-82J0HGDFVJ"
+};const appFirebase=initializeApp(firebaseConfig),auth=getAuth(appFirebase),database=getDatabase(appFirebase);
 const emailForName = name => name.trim().toLowerCase() + '@moderators.frp-login.invalid';
 let creatingAccount=false;
 const defaultDB=()=>({reports:[],sessions:[]});let db=defaultDB(),user='',uid='',unsubs=[];
